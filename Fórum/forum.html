@@ -1,0 +1,93 @@
+<div id="anon-forum" style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <h2 style="color: #333; text-align: center; margin-bottom: 20px;">Fale com a comunidade</h2>
+  
+  <div style="background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 20px;">
+    <input type="text" id="forum-nick" placeholder="Seu Nick" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" maxlength="30">
+    <textarea id="forum-comment" placeholder="Escreva seu comentário..." rows="3" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"></textarea>
+    <button onclick="postComment()" style="background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">Comentar</button>
+  </div>
+
+  <div id="forum-posts" style="display: flex; flex-direction: column; gap: 10px;">
+    <p style="text-align: center; color: #777;" id="forum-loading">Carregando comentários...</p>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7rjkzQ_HqwKYhZfO_6cDH3V5O2pVt4ulpOYxuoPBBY67jztLToUzYdPmXg6tiq7w8/exec";
+
+  function loadComments() {
+    fetch(SCRIPT_URL)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById("forum-posts");
+        container.innerHTML = "";
+        
+        if (data.length === 0) {
+          container.innerHTML = '<p style="text-align: center; color: #777;">Nenhum comentário ainda. Seja o primeiro!</p>';
+          return;
+        }
+
+        data.reverse().forEach(post => {
+          const postDiv = document.createElement("div");
+          postDiv.style.cssText = "background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #ddd;";
+          const header = document.createElement("div");
+          header.style.cssText = "display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; color: #555;";
+          
+          const nickSpan = document.createElement("span");
+          nickSpan.style.fontWeight = "bold";
+          nickSpan.textContent = post.nick || "Anônimo";
+          
+          const dateSpan = document.createElement("span");
+          dateSpan.textContent = post.date || "";
+          
+          header.appendChild(nickSpan);
+          header.appendChild(dateSpan);
+          
+          const content = document.createElement("div");
+          content.style.cssText = "word-break: break-word; color: #333; font-size: 0.95em;";
+          content.textContent = post.comment;
+          
+          postDiv.appendChild(header);
+          postDiv.appendChild(content);
+          container.appendChild(postDiv);
+        });
+      })
+      .catch(error => {
+        document.getElementById("forum-posts").innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar comentários.</p>';
+      });
+  }
+
+  function postComment() {
+    const nick = document.getElementById("forum-nick").value.trim() || "Anônimo";
+    const comment = document.getElementById("forum-comment").value.trim();
+
+    if (!comment) {
+      alert("O comentário não pode estar vazio.");
+      return;
+    }
+
+    const btn = document.querySelector("#anon-forum button");
+    btn.disabled = true;
+    btn.textContent = "Enviando...";
+
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nick: nick, comment: comment })
+    })
+    .then(() => {
+      document.getElementById("forum-comment").value = "";
+      btn.disabled = false;
+      btn.textContent = "Comentar";
+      setTimeout(loadComments, 1500);
+    })
+    .catch(error => {
+      alert("Erro ao enviar comentário.");
+      btn.disabled = false;
+      btn.textContent = "Comentar";
+    });
+  }
+
+  loadComments();
+</script>
