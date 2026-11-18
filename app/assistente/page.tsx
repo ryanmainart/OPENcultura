@@ -1,0 +1,1 @@
+export default function Assistant(){return <main className="wrap inner"><div className="eyebrow"><i/> Orientação sobre software livre</div><h1>Assistente de AI<span className="accent">.</span></h1><iframe src="/assistant.html" title="Conversa com o assistente OPEN Cultura" height="620"/></main>}
