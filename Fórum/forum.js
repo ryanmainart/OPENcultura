@@ -1,4 +1,4 @@
-var sheetName = "Página1"; // Altere se o nome da sua aba for diferente
+var sheetName = "Página1";
 
 function doGet(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
