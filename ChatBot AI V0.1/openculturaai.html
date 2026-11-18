@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="https://vdk-viber-runtime-prod.bot.botpress.host/edge/webchat.css" />
+<script src="https://vdk-viber-runtime-prod.bot.botpress.host/edge/webchat.js"></script>
+<script>
+  fetch("https://vdk-viber-runtime-prod.bot.botpress.host/edge/bots/9c9339f0-2a9c-4947-a1c8-ff9d4f7f035d/config")
+    .then((res) => res.json())
+    .then(({ webchat }) =>
+      VdkEdgeWebchat.mount({ ...webchat, mode: "standalone", baseUrl: "https://vdk-viber-runtime-prod.bot.botpress.host", botId: "9c9339f0-2a9c-4947-a1c8-ff9d4f7f035d" })
+    )
+</script>
