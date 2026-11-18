@@ -1,0 +1,55 @@
+<div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
+  <input type="file" id="upload-file" style="width: 100%; margin-bottom: 10px;">
+  <button onclick="uploadToDrive()" id="upload-btn" style="background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold;">Enviar para o Drive</button>
+  <p id="upload-status" style="margin-top: 10px; font-size: 0.9em; text-align: center; color: #555;"></p>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTR7tPCMdhPK9_jb86mgsgytLw3gRB4NnxfkUz3UnagljOVfEhV7O47V3efRUEAhWB/exec";
+
+  function uploadToDrive() {
+    const fileInput = document.getElementById("upload-file");
+    const status = document.getElementById("upload-status");
+    const btn = document.getElementById("upload-btn");
+
+    if (fileInput.files.length === 0) {
+      status.textContent = "Selecione um arquivo primeiro.";
+      status.style.color = "red";
+      return;
+    }
+
+    const file = fileInput.files[0];
+    status.textContent = "Enviando...";
+    status.style.color = "#555";
+    btn.disabled = true;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64Content = e.target.result.split(",")[1];
+      const payload = {
+        fileName: file.name,
+        mimeType: file.type,
+        fileContent: base64Content
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        status.textContent = "Upload concluído com sucesso!";
+        status.style.color = "green";
+        fileInput.value = "";
+        btn.disabled = false;
+      })
+      .catch(error => {
+        status.textContent = "Erro ao enviar o arquivo.";
+        status.style.color = "red";
+        btn.disabled = false;
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
